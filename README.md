@@ -12,7 +12,8 @@ It is however NOT a recommended practice to download a precompiled crypto librar
 
 See [How-to build libotr3.js](https://github.com/mnaamani/otr3-em/blob/master/BUILDING)
 
-The API aims to be identical to the [native nodejs bindings](https://github.com/mnaamani/node-otr-v2/)
+The API aims to be identical to the native nodejs bindings module [otr3](https://github.com/mnaamani/node-otr-v2/)
+
 [API](https://github.com/mnaamani/otr3-em/blob/master/doc/API.md)
 
 ## otr3-em License
