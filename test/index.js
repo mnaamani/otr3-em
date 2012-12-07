@@ -110,7 +110,7 @@ otrchan_b.on("smp_request",function(){
 
 otrchan_a.send("Hello Bob!");
 
-otrchan_a.connect();
+//otrchan_a.connect();
 
 var loop = setInterval(function(){
     console.log("_");
