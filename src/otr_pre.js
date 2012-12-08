@@ -168,7 +168,7 @@ Module['preRun'].push(function(){
     Module["libotrl"] = {};
     Module["libotrl"]["version"] = otrl_.version = cwrap('otrl_version','string');    
     Module["libotrl"]["userstate_create"]=otrl_.userstate_create=cwrap('otrl_userstate_create','',['number']);
-    Module["libotrl"]["userstate_destroy"]=otrl_.userstate_destroy=cwrap('otrl_userstate_destroy','',['number']);
+    Module["libotrl"]["userstate_free"]=otrl_.userstate_free=cwrap('otrl_userstate_free','',['number']);
     Module["libotrl"]["privkey_read"]=otrl_.privkey_read=cwrap('otrl_privkey_read','number',['number','string']);
     Module["libotrl"]["privkey_fingerprint"]=otrl_.privkey_fingerprint=cwrap('otrl_privkey_fingerprint','number',['number','number','string','string']);
     Module["libotrl"]["privkey_read_fingerprints"]=otrl_.privkey_read_fingerprints=cwrap('otrl_privkey_read_fingerprints','number',['number','string','number','number']); 

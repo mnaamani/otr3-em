@@ -156,8 +156,8 @@ OtrlMessageAppOps* jsapi_messageappops_new(){
     ops->gone_insecure = msgops_callback_gone_insecure;
     ops->still_secure = msgops_callback_still_secure;
     ops->log_message = msgops_callback_log_message;
-    //ops->max_message_size = msgops_callback_max_message_size;
-    ops->max_message_size = NULL;//disables fragmentation!
+    ops->max_message_size = msgops_callback_max_message_size;
+    //ops->max_message_size = NULL;//disables fragmentation!
     ops->account_name_free = msgops_callback_account_name_free;
     ops->account_name = msgops_callback_account_name;
 

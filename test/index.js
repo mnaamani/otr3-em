@@ -51,6 +51,10 @@ function handle_messages(O,callback){
     callback();
     if(verbose)dumpConnContext(O.channel,O.channel.user.name);
 }
+
+console.log(otrchan_a);
+console.log(otrchan_b);
+
     
 //simulate a network connection between two parties
 otrchan_a.on("inject_message",function(msg){
@@ -100,6 +104,8 @@ otrchan_a.on("gone_secure",function(){
             console.log("Alice initiating SMP authentication to verify keys...");
             otrchan_a.start_smp();
     }
+    otrchan_a.send("Hello Bob!");
+
 });
 
 otrchan_b.on("smp_request",function(){
@@ -107,19 +113,10 @@ otrchan_b.on("smp_request",function(){
         otrchan_b.respond_smp('s3cr37');
 });
 
-
-otrchan_a.send("Hello Bob!");
-
-//otrchan_a.connect();
+otrchan_a.connect();
 
 var loop = setInterval(function(){
     console.log("_");
-    if(otrchan_a.isEncrypted() && !otrchan_a.tryingSMP){
-        otrchan_a.tryingSMP = true;
-        console.log("starting SMP");
-        otrchan_a.start_smp();
-        return;
-    }
     if(otrchan_a.isEncrypted() && otrchan_a.isAuthenticated()){
         console.log("Finger print verification successful");
         dumpConnContext(otrchan_a,"Alice's ConnContext:");
