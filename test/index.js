@@ -104,16 +104,17 @@ otrchan_a.on("gone_secure",function(){
             console.log("Alice initiating SMP authentication to verify keys...");
             otrchan_a.start_smp();
     }
-    otrchan_a.send("Hello Bob!");
-
 });
 
 otrchan_b.on("smp_request",function(){
         console.log("Bob responding to SMP request.");
         otrchan_b.respond_smp('s3cr37');
 });
+otrchan_a.on("smp_complete",function(){
+    otrchan_a.send("Hello Bob! - 2");
+});
 
-otrchan_a.connect();
+otrchan_a.send("Hello Bob! - 1");
 
 var loop = setInterval(function(){
     console.log("_");
