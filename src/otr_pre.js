@@ -246,7 +246,7 @@ if(true){
         if(mpi_rem) __bigint2mpi(mpi_rem, r);
     };
 */      
-
+/* disabled mpi_gcd causes some tests to fail
         console.log("overriding __gcry_mpi_gcd");
         __gcry_mpi_gcd = function BigInt_MPI_GCD(mpi_g, mpi_a, mpi_b){
             //console.log(">__gcry_mpi_gcd()");
@@ -258,6 +258,7 @@ if(true){
             if( Module["MPI_HOOK"]["BigInt"]["equalsInt"](g,1) ) return 1;
             return 0;
         };
+*/
       console.log("overriding __gcry_mpi_mod");
 /*perf boost not tested but it should be enhancing..*/
         __gcry_mpi_mod = function BigInt_MPI_MOD(mpi_r,mpi_x,mpi_n){
