@@ -15,8 +15,8 @@ EXPORTED_FUNCS= -s EXPORTED_FUNCTIONS="['_gcry_strerror','_malloc','_free','__gc
             '_jsapi_conncontext_get_trust', '_jsapi_initialise','_jsapi_messageappops_new']"
 
 OPTIMISATION_OFF= -O0 --closure 0 --llvm-opts 0 --minify 0 -s LINKABLE=1
-#O2 optimisation causing gcrypt bug, closure will break virtual file system import/export functionality
-OPTIMISATION_ON= -O1 --closure 0 --llvm-opts 0 --minify 1 -s LINKABLE=1 $(EXPORTED_FUNCS)
+#O2 optimisation requires --llvm-opts 1, closure will break virtual file system import/export functionality
+OPTIMISATION_ON= -O2 --closure 0 --llvm-opts 1 --minify 0 -s LINKABLE=1 $(EXPORTED_FUNCS)
 
 OPTIMISATION= $(OPTIMISATION_OFF)
 
