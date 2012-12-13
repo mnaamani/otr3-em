@@ -106,13 +106,13 @@ our selected name for the buddy Bob.
 The following methods of the ConnContext expose the internal properties:
 
 * protocol(): string: eg. "xmpp"
-* username(): string: name we have given to the buddy, "BOB"
-* accountname(): string: account name of the otr key, eg. "alice@jabber.org"
-* fingerprint(): string: active fingerprint - of recipient's key
+* username(): string: name we have given to the buddy, eg. "BOB"
+* accountname(): string: our account name , eg. "alice@jabber.org"
+* fingerprint(): string: fingerprint of buddy in an active Session()
 * protocol_version(): number: otr protocol version in use, eg. 2
 * msgstate(): number: 0 = plaintext, 1 = encrypted
 * smstate(): number: current state of the SMP (Socialist Millionaire's Protocol)
-* trust(): string: 'smp' if recipient's fingerprint has been verified by SMP
+* trust(): string: 'smp' if buddy/fingerprint has been verified by SMP
 
 
 ## Session()  (formally OTRChannel)
@@ -185,7 +185,7 @@ return true only if the fingerprint of the buddy has been authenticated/verified
 * smp_complete() - SMP authentication completed successfully.
 * smp_failed() - SMP failed (usually buddy doesn't know the secret)
 * smp_aborted() - SMP (something went wrong at the protocol level)
-* 
+
 * remote_disconnected() - session closed() [remotely]
 * update_context_list() - fired when underlying ConnContext changes (inteded mostly for UI updates)
 * shutdown() - session was closed() [locally]
@@ -217,3 +217,12 @@ The policy is used as a parameter in Session().
     'DEFAULT'
     
 ## VFS() - The Virtual File System
+
+  export:
+  import:
+  load:
+  save:
+  importFile:
+  exportFile:
+  
+
