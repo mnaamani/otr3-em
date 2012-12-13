@@ -14,28 +14,18 @@ EXPORTED_FUNCS= -s EXPORTED_FUNCTIONS="['_gcry_strerror','_malloc','_free','__gc
             '_jsapi_conncontext_get_protocol_version', '_jsapi_conncontext_get_smstate', '_jsapi_conncontext_get_active_fingerprint', \
             '_jsapi_conncontext_get_trust', '_jsapi_initialise','_jsapi_messageappops_new']"
 
-OPTIMISATION_OFF= -O0 --closure 0 --llvm-opts 0 --minify 0 -s LINKABLE=1
 #O2 optimisation requires --llvm-opts 1, closure will break virtual file system import/export functionality
-OPTIMISATION_ON= -O2 --closure 0 --llvm-opts 1 --minify 0 -s LINKABLE=1 $(EXPORTED_FUNCS)
-
-OPTIMISATION= $(OPTIMISATION_OFF)
-
-module:
-	mkdir -p $(BUILD_DIR)/
-	$(EMCC) src/jsapi.c -I$(CRYPTO_BUILD)/include -lotr -L$(CRYPTO_BUILD)/lib \
-        -o $(BUILD_DIR)/libotr3.js \
-		--pre-js src/otr_pre.js \
-        --post-js src/otr_post.js \
-		-s TOTAL_MEMORY=1048576  -s TOTAL_STACK=409600 \
-        $(OPTIMISATION)
+OPTIMISATION = -O2 --closure 0 --llvm-opts 1 --minify 0 -s LINKABLE=1 $(EXPORTED_FUNCS)
 
 module-optimised:
 	mkdir -p $(BUILD_DIR)/
-	cp src/otr_post.js $(BUILD_DIR)/libotr3.js
+	cp src/header.js $(BUILD_DIR)/_libotr3.js
 	$(EMCC) src/jsapi.c -I$(CRYPTO_BUILD)/include -lotr -L$(CRYPTO_BUILD)/lib \
-        -o $(BUILD_DIR)/_libotr3.js \
+        -o $(BUILD_DIR)/libotr3_tmp.js \
 		--pre-js src/otr_pre.js \
 		-s TOTAL_MEMORY=1048576  -s TOTAL_STACK=409600 \
-        $(OPTIMISATION_ON)
-	cat $(BUILD_DIR)/_libotr3.js >> $(BUILD_DIR)/libotr3.js
-	rm $(BUILD_DIR)/_libotr3.js
+        $(OPTIMISATION)
+	cat $(BUILD_DIR)/libotr3_tmp.js >> $(BUILD_DIR)/_libotr3.js
+	cat src/footer.js >> $(BUILD_DIR)/_libotr3.js
+	mv $(BUILD_DIR)/_libotr3.js $(BUILD_DIR)/libotr3.js
+	rm $(BUILD_DIR)/libotr3_tmp.js

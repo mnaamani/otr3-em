@@ -1,5 +1,9 @@
-var async = require("../lib/async");
-var libotr = require('../lib/otr-module');
+if(typeof exports !== 'undefined'){
+    var async = require("../lib/async");
+    var OTR = require("../lib/otr-module");
+}
+
+var libotr = new OTR();
 
 console.log("== loaded libotr version:",libotr.version());
 
@@ -10,11 +14,13 @@ var TEST_PASSED=false;
 var verbose =false;
 var FORCE_SMP = false;
 
-process.argv.forEach(function(arg){
+if(typeof process !== "undefined" ){
+ process.argv.forEach(function(arg){
     if(arg=="--verbose") verbose = true;
     if(arg=="--vfs") USE_VFS=true;
     if(arg=="--force-smp") FORCE_SMP=true;
-});
+ });
+}
 
 if(verbose){
     libotr.debugOn();
