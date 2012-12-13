@@ -1,52 +1,35 @@
-# OTR3-em - Off-the-Record Messaging [emscripten]
+OTR3-em - Off-the-Record Messaging [emscripten]
+=====================
 
-The module exports the following functions:
+## Getting started
 
-* version()
-* POLICY()
+Require the otr3-em module (underlying gcrypt and otr libraries will be
+initialised. An OTR API constructor is returned.
 
-[high-level API]
-* User()
-* OTRChannel() : [EventEmitter]
+    var OTR = require("otr3-em");
 
-[lower-level API]
-* UserState()
-* ConnContext()
+create and instance of the OTR API:
 
-## version()
-The version() function will return the version of the compiled libotr3.js.
-
-    var libotr_version = require("otr3-em").version();
-
-## POLICY(name)
-The policy is used as a parameter in OTRChannel.
-
-	var libotr = require("otr3-em");
-	var policy = libotr.POLICY("DEFAULT");
-
-	//available policies
-    'NEVER'
-    'ALLOW_V1'
-    'ALLOW_V2'
-    'REQUIRE_ENCRYPTION'
-    'SEND_WHITESPACE_TAG'
-    'WHITESPACE_START_AKE'
-    'ERROR_START_AKE'
-	'VERSION_MASK'
-	'OPPORTUNISTIC'
-	'MANUAL'
-	'ALWAYS'
-	'DEFAULT'
+    var otr = new OTR();
     
-## User()
-The User object is a wrapper for UserState (see below). It holds a user's configuration [name, keys, fingerprints] 
+## version()
+Returns version information of the underlying libotr:
 
-    var libotr = require("otr3-em");
-    var alice = new libotr.User({
+     console.log("Using version:", otr.version() );
+
+## User()
+The User object is a wrapper for UserState() (see below). It holds a user's configuration [name, keys, fingerprints] 
+
+    var OTR = require("otr3-em");
+    var otr = new OTR();    
+    
+    var alice = new OTR.User({
         name:'Alice',			      //an identifier for the User object
-        keys:'../home/alice/alice.keys',      //path to OTR keys file (required)
-        fingerprints:'../home/alice/alice.fp' //path to fingerprints file (required)
+        keys:'alice.keys',      //path to OTR keys file (required)
+        fingerprints:'alice/alice.fp' //path to fingerprints file (required)
     });
+
+Note: A Virtual file system (VFS) is used not the real file system. (see VFS() below)
 
 If files exists the keys and fingerprints will be loaded into the userstate automatically.
 A warning will be displayed otherwise.
@@ -54,9 +37,9 @@ A warning will be displayed otherwise.
 If you need to generate a new OTR key for a given accountname and protocol: 
 
     alice.generateKey("alice@jabber.org", "xmpp", function(err){
-        //callback function
-        //if error occured err will be the string representing the GPG error number.
-        //otherwise err will be 'null'
+        if(err){
+        	console.log("something went wrong!",err);
+        }        
     });
 
 To directly access the wrapped UserState object:
@@ -70,8 +53,9 @@ To directly access the wrapped UserState object:
 The UserState holds keys and fingerprints in memory. It exposes methods to read/write these keys
 and fingerprints to the file system, as well as methods to generate them.
 	
-	var libotr = require("otr3-em");
-	var userstate = new libotr.UserState();
+	var OTR = require("otr3-em");
+	var otr = new OTR();
+	var userstate = new otr.UserState();
 
 
 ### userstate.generateKey(path_to_keys_file, accountname, protocol, [callback])
@@ -81,8 +65,7 @@ userstate/keys are written out to file.
 
 	userstate.generateKey('/home/alice/myotr.keys', 'alice@jabber.org','xmpp',function(err){
 		//call back with err if any
-		if(err){
-			//oops something went wrong.
+		if(err){			
 			console.log(err);
 		}
 	});
@@ -108,19 +91,19 @@ Synchronously reads the stored fingerprints into the userstate.
 ### userstate.writeFingerprintsSync(path_to_fingerprints_file)
 Synchronously writes out the fingerprints in userstate to file.
 
-## ConnContext
+## ConnContext()
 A ConnContext with buddy 'BOB' for a given UserState (userstate) can be created as follows:
 
-    var ctx = new libotr.ConnContext(userstate, "alice@jabber.org","xmpp","BOB" );
+    var ctx = new otr.ConnContext(userstate, "alice@jabber.org","xmpp","BOB" );
 
 where the second and third arguments specifiy which OTR key to use. The last argument is
-our selected name for the buddy Bob;
+our selected name for the buddy Bob.
 
-Or from a User object (alice):
+..or from a User object (alice):
 
     var ctx = alice.ConnContext("alice@jabber.org","xmpp","BOB");
 
-The following methods of the ConnContext object give access to its properties:
+The following methods of the ConnContext expose the internal properties:
 
 * protocol(): string: eg. "xmpp"
 * username(): string: name we have given to the buddy, "BOB"
@@ -132,73 +115,105 @@ The following methods of the ConnContext object give access to its properties:
 * trust(): string: 'smp' if recipient's fingerprint has been verified by SMP
 
 
-## OTRChannel
-OTRChannel creates a simple interface for exchanging messages with a buddy. As arguments
-it takes a User,ConnContext,and a dictionary of parameters for the channel:
+## Session()  (formally OTRChannel)
+To setup an OTR conversation with a buddy, create a Session(). As arguments
+it takes a User, ConnContext, and a set of parameters for the session. Sessions instances
+are event emitters.
 
-    var otrchannel = new libotr.OTRChannel(alice, BOB, {
-        policy:libotr.POLICY("ALWAYS"), //optional policy - default = POLICY("DEFAULT")
-        MTU:5000,          //optional - max fragment size in bytes - default=0,no-fragmentation
-        secret:"SECRET",   //secret for SMP authentication.                           
-        secrets:{'question-1':'secret-1',
-                 'question-2':'secret-2'} //questions,answers pairs for SMP Authentication.
+**Setting up a Session()**
+
+    var session = new otr.Session(alice, BOB, {
+        policy: otr.POLICY("ALWAYS"), //optional policy - default = POLICY("DEFAULT")
+        MTU: 5000,          //optional - max fragment size in bytes - default=0,no-fragmentation
+        secret: "SECRET",   //secret for SMP authentication.                           
+        secrets: {'question-1':'secret-1',
+                  'question-2':'secret-2'} //questions,answers pairs for SMP Authentication.
     });
 
-### Methods:
+**Starting and Ending an OTR conversation**
 
-### otrchan.connect()
+### session.connect()
 connect() will initiate the otr protocol
 This can be used if we wish to initiate the protocol without sending an actual message.
 
-### otrchan.send(message)
+### session.close()
+close() will end the otr session.
+
+**Exchanging Messages**
+
+### session.send(message)
 send() will fragment and send message.toString()
 
-### otrchan.recv(message)
+### session.recv(message)
 call recv() when receiving message
 
-### otrchan.close()
-close() will shutdown the otr channel.
+**Authenticating with SMP (Socialist Millionaire's Protocol)**
 
-### otrchan.start_smp([secret])
+### session.start_smp([secret])
 starts SMP authentication. If otional [secret] is not passed it is taken from the parameters.
 
-### otrchan.start_smp_question(question,[secret])
+### session.start_smp_question(question,[secret])
 start SMP authentication with a question and optional [secret]. If secret is not passed 
-it is taken from the parameters of the otrchannel.
+it is taken from the parameters.
 
-### otrchan.respond_smp([secret])
+### session.respond_smp([secret])
 responds to SMP authentication request with optional [secret]. If secret is not passed 
-it is taken from the parameters of the otrchannel.
+it is taken from the parameters.
 
-### otrchan.isEncrypted()
-returns 'true' only if current session is encrypted.
+**At anytime we can check encryption and trust level of the session**
 
-### otrchan.isAuthenticated()
-return 'true' only if fingerprint of remote side has been authenticated/verified by SMP.
+### session.isEncrypted()
+returns true only if current session is encrypted.
 
-### Events
+### session.isAuthenticated()
+return true only if the fingerprint of the buddy has been authenticated/verified by SMP.
+
+**Handling Session events**
 
 * message(msg) - received decrypted 'msg' message.
 
-* inject_message(msg_fragment) - msg_fragment to be sent on the channel.
+* inject_message(msg_fragment) - encrypted msg_fragment to be sent to buddy.
 
 * gone_secure() - message exchange is now encrypted.
 * gone_insecure() - message exchange is now in plain text.
 * still_secure() - encryption re-negotiated. message exchange is encrypted.
 
 * create_privkey() - a private key for account/protocol specified was not found and needs to be created.
-* new_fingerprint(fingerprint) - first time we are seeing remote buddy's fingerprint. This is a que to begin authentication.
+* new_fingerprint(fingerprint) - first time we are seeing buddy's fingerprint. This is a que to begin authentication.
 
-* smp_request(question) - buddy has started a SMP authentication. (possibly with a question)
+* smp_request(question) - buddy has started SMP authentication. (possibly with a question)
 * smp_complete() - SMP authentication completed successfully.
 * smp_failed() - SMP failed (usually buddy doesn't know the secret)
 * smp_aborted() - SMP (something went wrong at the protocol level)
-
-* remote_disconnected() - channel closed() remotely.
+* 
+* remote_disconnected() - session closed() [remotely]
 * update_context_list() - fired when underlying ConnContext changes (inteded mostly for UI updates)
-* shutdown() - channel was closed (locally)
+* shutdown() - session was closed() [locally]
 
 * display_otr_message(msg) //human readable notification message
 * notify(title,primary,secondary) //notification (fired after display_otr_message for same notification message)
 * log_message(msg) //debug log messages from libotr
 
+## POLICY(name)
+
+The policy is used as a parameter in Session().
+
+    var OTR = require("otr3-em");
+    var otr = new OTR();    
+    var policy = otr.POLICY("DEFAULT");
+
+    //available policies
+    'NEVER'
+    'ALLOW_V1'
+    'ALLOW_V2'
+    'REQUIRE_ENCRYPTION'
+    'SEND_WHITESPACE_TAG'
+    'WHITESPACE_START_AKE'
+    'ERROR_START_AKE'
+    'VERSION_MASK'
+    'OPPORTUNISTIC'
+    'MANUAL'
+    'ALWAYS'
+    'DEFAULT'
+    
+## VFS() - The Virtual File System
