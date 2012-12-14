@@ -12,7 +12,7 @@ EXPORTED_FUNCS= -s EXPORTED_FUNCTIONS="['_gcry_strerror','_malloc','_free','__gc
             '_jsapi_privkey_get_protocol', '_jsapi_userstate_get_privkey_root', '_jsapi_conncontext_get_protocol', \
             '_jsapi_conncontext_get_username', '_jsapi_conncontext_get_accountname','_jsapi_conncontext_get_msgstate', \
             '_jsapi_conncontext_get_protocol_version', '_jsapi_conncontext_get_smstate', '_jsapi_conncontext_get_active_fingerprint', \
-            '_jsapi_conncontext_get_trust', '_jsapi_initialise','_jsapi_messageappops_new']"
+            '_jsapi_conncontext_get_trust', '_jsapi_initialise','_jsapi_messageappops_new','_otrl_privkey_forget','_otrl_privkey_forget_all','_otrl_privkey_find', 'jsapi_privkey_delete', 'jsapi_privkey_print_token']"
 
 #O2 optimisation requires --llvm-opts 1, closure will break virtual file system import/export functionality
 OPTIMISATION = -O2 --closure 0 --llvm-opts 1 --minify 0 -s LINKABLE=1 $(EXPORTED_FUNCS)

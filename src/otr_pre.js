@@ -7,7 +7,7 @@ Module["MPI_HOOK"] = {};
 if (typeof exports !== 'undefined') {
     Module["MPI_HOOK"]["BigInt"]= require("./bigint");
 }else{
-    Module["MPI_HOOK"]["BigInt"] = this["root"]["BigInt"];
+    Module["MPI_HOOK"]["BigInt"] = this["BigInt"];
 }
 
 /* emcc is generating this code when libgpg-error is compiled to js.. :(
@@ -104,6 +104,9 @@ Module['preRun'].push(function(){
     Module["libotrl"]["privkey_read_fingerprints"]=otrl_.privkey_read_fingerprints=cwrap('otrl_privkey_read_fingerprints','number',['number','string','number','number']); 
     Module["libotrl"]["privkey_write_fingerprints"]=otrl_.privkey_write_fingerprints=cwrap('otrl_privkey_write_fingerprints','number',['number','string']);
     Module["libotrl"]["privkey_generate"]=otrl_.privkey_generate=cwrap('otrl_privkey_generate','number',['number','string','string','string']);    
+    Module["libotrl"]["privkey_forget"]=otrl_.privkey_forget=cwrap('otrl_privkey_forget','',['number']);
+    Module["libotrl"]["privkey_forget_all"]=otrl_.privkey_forget_all=cwrap('otrl_privkey_forget_all','',['number']);
+    Module["libotrl"]["privkey_find"]=otrl_.privkey_find=cwrap('otrl_privkey_find','number',['number','string','string']);
     Module["libotrl"]["context_find"]=otrl_.context_find=cwrap('otrl_context_find','number',['number','string','string','string','number','number','number','number']);
     Module["libotrl"]["message_sending"]=otrl_.message_sending=cwrap('otrl_message_sending','number',['number','number','number','string','string','string','string','number','number','number','number']);
     Module["libotrl"]["message_free"]=otrl_.message_free=cwrap('otrl_message_free','',['number']);
@@ -130,6 +133,8 @@ Module['preRun'].push(function(){
     Module["jsapi"]["conncontext_get_trust"]=jsapi_.conncontext_get_trust = cwrap('jsapi_conncontext_get_trust','string',['number']);
     Module["jsapi"]["initialise"]=jsapi_.initialise = cwrap('jsapi_initialise');
     Module["jsapi"]["messageappops_new"]=jsapi_.messageappops_new = cwrap('jsapi_messageappops_new','number');
+    Module["jsapi"]["privkey_delete"]=jsapi_.privkey_delete = cwrap('jsapi_privkey_delete','',['number','string','string','string']);
+    Module["jsapi"]["privkey_print_token"]=jsapi_.privkey_print_token = cwrap('jsapi_privkey_print_token','number',['number','string','number','number']);
 
 // some of the MPI calculations are slow
 // can we use pure javascript crypto and still preserve the libgcrypt API?

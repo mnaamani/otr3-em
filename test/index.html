@@ -1,13 +1,24 @@
 <html lang="en">
   <head>
     <title>OTR3-em</title>
-  </head>
-  <body></body>
+  <script>
+    var process = {
+        exit:function(){},
+        argv: []
+    };
+  </script>
   <script src="../lib/async.js"></script>
   <script src="../lib/seedrandom.js"></script>
   <script src="../lib/bigint.js"></script>
   <script src="../lib/libotr3.js"></script>
   <script src="../lib/libotr-js-bindings.js"></script>
   <script src="../lib/otr-module.js"></script>
-  <script src="index.js"></script>
+  </head>
+  <body>
+    <script>
+        var otr = new OTR();
+        document.write( "OTR_VERSION:" + otr.version() );
+    </script>
+   <script src="index.js"></script>
+  </body>
 </html>

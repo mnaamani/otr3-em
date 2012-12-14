@@ -28,6 +28,76 @@ char* jsapi_privkey_get_protocol(OtrlPrivKey* p){
     return p->protocol;
 }
 
+gcry_error_t jsapi_privkey_delete(OtrlUserState us, const char *filename,
+	const char *accountname, const char *protocol)
+{
+    gcry_error_t err;
+    FILE *privf;
+    OtrlPrivKey *p;
+    mode_t oldmask;
+    oldmask = umask(077);
+
+    privf = fopen(filename, "w+b");
+
+    if (!privf) {
+        umask(oldmask);
+    	err = gcry_error_from_errno(errno);
+    	return err;
+    }
+
+    /* Output all the keys we know ...*/
+    fprintf(privf, "(privkeys\n");
+
+    for (p=us->privkey_root; p; p=p->next) {
+	    /* .. skip the one we want to delete */
+	    if (!strcmp(p->accountname, accountname) &&
+		    !strcmp(p->protocol, protocol)) {
+	        continue;
+	    }
+        puts("writing account");
+	    account_write(privf, p->accountname, p->protocol, p->privkey);
+    }
+
+    fprintf(privf, ")\n");
+    fseek(privf, 0, SEEK_SET);
+    fclose(privf);
+    umask(oldmask);
+
+    return err;
+}
+gcry_error_t
+jsapi_privkey_print_token(OtrlPrivKey *keyToExport, const char* token, 
+            unsigned char *buffer, size_t buflen, size_t *nbytes)
+{
+    gcry_error_t err;
+    gcry_mpi_t x;
+    gcry_sexp_t dsas,xs;
+    size_t nx;
+    enum gcry_mpi_format format = GCRYMPI_FMT_HEX;
+    gcry_sexp_t privkey = keyToExport->privkey;
+
+    dsas = gcry_sexp_find_token(privkey, "dsa", 0);
+    if (dsas == NULL) {
+        return gcry_error(GPG_ERR_UNUSABLE_SECKEY);
+    }
+
+    xs = gcry_sexp_find_token(dsas, token, 0);
+    gcry_sexp_release(dsas);
+    if (!xs){
+        gcry_sexp_release(xs);
+        return gcry_error(GPG_ERR_UNUSABLE_SECKEY);
+    }
+    x = gcry_sexp_nth_mpi(xs, 1, GCRYMPI_FMT_USG);
+    gcry_sexp_release(xs);
+
+    if (!x) {
+        gcry_mpi_release(x);
+        return gcry_error(GPG_ERR_UNUSABLE_SECKEY);
+    }
+    err =  gcry_mpi_print(format, buffer,buflen,nbytes,x);
+    gcry_mpi_release(x);
+    return err;
+}
 char* jsapi_conncontext_get_protocol(ConnContext* ctx){
     return ctx->protocol;
 }

@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <gcrypt.h>
 #include <libotr/proto.h>
 #include <libotr/userstate.h>
@@ -11,6 +12,8 @@ OtrlPrivKey* jsapi_userstate_get_privkey_root(OtrlUserState us);
 OtrlPrivKey* jsapi_privkey_get_next(OtrlPrivKey* p);
 char* jsapi_privkey_get_accountname(OtrlPrivKey* p);
 char* jsapi_privkey_get_protocol(OtrlPrivKey* p);
+gcry_error_t jsapi_privkey_delete(OtrlUserState us, const char *filename, const char *accountname, const char *protocol);
+gcry_error_t jsapi_privkey_print_token(OtrlPrivKey *keyToExport, const char* token, unsigned char *buffer, size_t buflen, size_t *nbytes);
 char* jsapi_conncontext_get_protocol(ConnContext* ctx);
 char* jsapi_conncontext_get_username(ConnContext* ctx);
 char* jsapi_conncontext_get_accountname(ConnContext* ctx);
