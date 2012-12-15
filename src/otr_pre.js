@@ -23,6 +23,7 @@ var _static_new_mpi_ptr_ptr;
 var gcry_ = {};
 var jsapi_ = {};
 var otrl_ = {};
+var helper_ = {};
 
 //todo:copy directly between memory and bigint array.. (faster than string conversions?..)
 function __mpi2bigint(mpi_ptr){
@@ -134,7 +135,13 @@ Module['preRun'].push(function(){
     Module["jsapi"]["initialise"]=jsapi_.initialise = cwrap('jsapi_initialise');
     Module["jsapi"]["messageappops_new"]=jsapi_.messageappops_new = cwrap('jsapi_messageappops_new','number');
     Module["jsapi"]["privkey_delete"]=jsapi_.privkey_delete = cwrap('jsapi_privkey_delete','',['number','string','string','string']);
-    Module["jsapi"]["privkey_print_token"]=jsapi_.privkey_print_token = cwrap('jsapi_privkey_print_token','number',['number','string','number','number']);
+    Module["jsapi"]["privkey_get_dsa_token"]=jsapi_.privkey_get_dsa_token = cwrap('jsapi_privkey_get_dsa_token','number',['number','string','number','number']);
+    Module["jsapi"]["userstate_import_privkey"]=jsapi_.userstate_import_privkey = cwrap('jsapi_userstate_import_privkey','number',['number','string','string','number','number','number','number','number']);
+    Module["jsapi"]["userstate_write_to_file"]=jsapi_.userstate_write_to_file = cwrap('jsapi_userstate_write_to_file','number',['number','string']);
+    
+    Module["helper"]={};
+    Module["helper"]["mpi2bigint"] = helper_.mpi2bigint = __mpi2bigint;
+    Module["helper"]["bigint2mpi"] = helper_.bigint2mpi = __bigint2mpi;
 
 // some of the MPI calculations are slow
 // can we use pure javascript crypto and still preserve the libgcrypt API?
