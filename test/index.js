@@ -31,14 +31,14 @@ if(USE_VFS){
     var VFS = libotr.VFS(__dirname+"/default.vfs").load();
 }
 
-var keys_dir = "";
+var keys_dir = "/";
 
 var alice = new libotr.User({name:'alice',keys:keys_dir+'/alice.keys',fingerprints:keys_dir+'/alice.fp'});
 //if we dont have a key make one
 if( !alice.state.fingerprint("alice@telechat.org","telechat") ){
 alice.generateKey("alice@telechat.org","telechat",function(err){
     if(err){
-        console.error("error generating key:",err);
+        console.error("error generating key:",err.message);
     }else{
         console.log("Key Generation Complete.");
     }
@@ -52,7 +52,7 @@ var bob = new libotr.User({name:'bob',keys:keys_dir+'/bob.keys',fingerprints:key
 if( !bob.state.fingerprint("bob@telechat.org","telechat") ){
 bob.generateKey("bob@telechat.org","telechat",function(err){
     if(err){
-        console.error("error generating key:",err);
+        console.error("error generating key:",err.message);
     }else{
         console.log("Key Generation Complete.");
     }
