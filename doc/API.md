@@ -8,102 +8,108 @@ initialised. An OTR API constructor is returned.
 
     var OTR = require("otr3-em");
 
-create and instance of the OTR API:
+create an instance of the OTR API:
 
     var otr = new OTR();
     
-## version()
+## otr.version()
 Returns version information of the underlying libotr:
 
      console.log("Using version:", otr.version() );
 
-## User()
-The User object is a wrapper for UserState() (see below). It holds a user's configuration [name, keys, fingerprints] 
+## otr.User( config )
+The User object is used to manage a user's accounts (public keys) and known fingerprints.
 
     var OTR = require("otr3-em");
-    var otr = new OTR();    
+    var otr = new OTR();
     
-    var alice = new OTR.User({
-        name:'Alice',			      //an identifier for the User object
-        keys:'alice.keys',      //path to OTR keys file (required)
-        fingerprints:'alice/alice.fp' //path to fingerprints file (required)
+    var user = new OTR.User({ 
+        keys:'/alice.keys',      //path to OTR keys file (required)
+        fingerprints:'alice.fp' //path to fingerprints file (required)
     });
 
-Note: A Virtual file system (VFS) is used not the real file system. (see VFS() below)
+All data is loaded in memory (UserState) and persisted on the virtual file system VFS().
 
-If files exists the keys and fingerprints will be loaded into the userstate automatically.
-A warning will be displayed otherwise.
+If specified files exist the keys and fingerprints will be loaded automatically.
+A warning will be logged to the console otherwise.
 
-If you need to generate a new OTR key for a given accountname and protocol: 
+### user.accounts()
 
-    alice.generateKey("alice@jabber.org", "xmpp", function(err){
-        if(err){
-        	console.log("something went wrong!",err);
-        }        
-    });
+We can check what accounts have been load..
 
-To directly access the wrapped UserState object:
-
-    var userstate = alice.state;
-    userstate.accounts().forEach(function(account){
+    user.accounts().forEach(function(account){
         console.log(account.fingerprint);
     });
 
-## UserState()
-The UserState holds keys and fingerprints in memory. It exposes methods to read/write these keys
-and fingerprints to the file system, as well as methods to generate them.
-	
-	var OTR = require("otr3-em");
-	var otr = new OTR();
-	var userstate = new otr.UserState();
+	[ { accountname: 'alice@jabber.org',
+	    protocol: 'xmpp',
+	    fingerprint: '65D366AF CF9B065F 41708CB0 1DC26F61 D3DF5935',
+	    privkey: [Object] } ]
+
+### user.generateKey(accountname,protocol,function callback(err,key) )
+
+To generate an OTR key for a given accountname and protocol:
+(If a key already exists it will be overwritten)
+
+    user.generateKey("alice@jabber.org", "xmpp", function(err, key){
+        if(err){
+        	console.log("something went wrong!",err.message);
+        }else{
+        	console.log("Generated Key Successfully:",key.exportPublic() );
+        }
+    });
 
 
-### userstate.generateKey(path_to_keys_file, accountname, protocol, [callback])
-generateKey() will 'synchronously' generate a new OTR key for provided accountname/protocol (overwriting existing key).
-The newly generated key will be stored stored in the userstate. When the process is complete the 
-userstate/keys are written out to file.
+### user.fingerprint(accountname,protocol)
 
-	userstate.generateKey('/home/alice/myotr.keys', 'alice@jabber.org','xmpp',function(err){
-		//call back with err if any
-		if(err){			
-			console.log(err);
-		}
-	});
+To retreive the fingerprint of a key:
 
-### userstate.fingerprint(accountname,protocol)
-Returns the fingerprint of the key associated with accountname and protocol of the form:
+	user.fingerprint("alice@jabber.org","xmpp");
+
+returns
 
 	'65D366AF CF9B065F 41708CB0 1DC26F61 D3DF5935'
 
-### userstate.accounts()
-Returns an array of account objects:
+### user.findKey(accountname,protocol)
+Retrieve an OtrlPrivKey() instance if it exists. (null otherwise)
 
-	[ { accountname: 'alice@jabber.org',
-	    protocol: 'xmpp',
-	    fingerprint: '65D366AF CF9B065F 41708CB0 1DC26F61 D3DF5935' } ]
+### user.deleteKey(accountname,protocol)
+Deleted a key from memory and file if it exists.
 
-### userstate.readKeysSync(path_to_keys_file)
-Synchronously reads the stored keys into the userstate.
+### user.ConnContext(accountname, protocol, buddy_name)
+Create a ConnContext(). accountname and protocol will select the key to use in this context, and buddy_name 
+is our chosen name for the remote party which is stored in the fingerprints file.
 
-### userstate.readFingerprintsSync(path_to_fingerprints_file)
-Synchronously reads the stored fingerprints into the userstate.
+### user.writeFingerprints()
+Writes fingerprints out to file.
 
-### userstate.writeFingerprintsSync(path_to_fingerprints_file)
-Synchronously writes out the fingerprints in userstate to file.
+### user.writeKeys()
+Writes keys out to file.
 
-## ConnContext()
-A ConnContext with buddy 'BOB' for a given UserState (userstate) can be created as follows:
+### user.prototype.exportKeyHex(accountname,protocol)
+Exports the DSA key for the account/protocol. (Can be imported to another User using user.importKey())
 
-    var ctx = new otr.ConnContext(userstate, "alice@jabber.org","xmpp","BOB" );
+### user.prototype.exportKeyBigInt(accountname,protocol)
+Exports the DSA key for the account/protocol. (Can be imported to another User using user.importKey())
 
-where the second and third arguments specifiy which OTR key to use. The last argument is
-our selected name for the buddy Bob.
+### user.prototype.importKey(accountname,protocol,dsa)
+Will import a DSA key (exported using user.exportKeyHex or user.exportBigInt)
 
-..or from a User object (alice):
+## OtrlPrivKey
+This is the 'key' object returned in user.accounts(), user.generateKey() and user.findKey().
 
-    var ctx = alice.ConnContext("alice@jabber.org","xmpp","BOB");
+**privkey.accountname()** - Accountname the key is associated with.
+**privkey.protocol()** - Protocol the key is associated with.
+**privkey.export(format)** - Exports the private DSA key. format can be "HEX" or "BIGINT"
+**privkey.exportPublic(format)** - Exports only the public components of the DSA key. format can be "HEX" or "BINGINT"
 
-The following methods of the ConnContext expose the internal properties:
+## otr.ConnContext()
+A ConnContext with buddy 'BOB' is created from a User() object. The last argument is
+our selected name for buddy Bob.
+
+    var context = alice.ConnContext("alice@jabber.org","xmpp","BOB");
+
+The following methods of the ConnContext() expose it's internal state:
 
 * protocol(): string: eg. "xmpp"
 * username(): string: name we have given to the buddy, eg. "BOB"
@@ -115,15 +121,16 @@ The following methods of the ConnContext expose the internal properties:
 * trust(): string: 'smp' if buddy/fingerprint has been verified by SMP
 
 
-## Session()  (formally OTRChannel)
+## otr.Session()
+
 To setup an OTR conversation with a buddy, create a Session(). As arguments
-it takes a User, ConnContext, and a set of parameters for the session. Sessions instances
+it takes a User, ConnContext, and a set of parameters for the session. Session instances
 are event emitters.
 
 **Setting up a Session()**
 
     var session = new otr.Session(alice, BOB, {
-        policy: otr.POLICY("ALWAYS"), //optional policy - default = POLICY("DEFAULT")
+        policy: otr.POLICY("ALWAYS"), //optional policy - default = otr.POLICY("DEFAULT")
         MTU: 5000,          //optional - max fragment size in bytes - default=0,no-fragmentation
         secret: "SECRET",   //secret for SMP authentication.                           
         secrets: {'question-1':'secret-1',
@@ -194,12 +201,12 @@ return true only if the fingerprint of the buddy has been authenticated/verified
 * notify(title,primary,secondary) //notification (fired after display_otr_message for same notification message)
 * log_message(msg) //debug log messages from libotr
 
-## POLICY(name)
+## otr.POLICY(name)
 
-The policy is used as a parameter in Session().
+The policy is used as a parameter when setting up a Session().
 
     var OTR = require("otr3-em");
-    var otr = new OTR();    
+    var otr = new OTR();
     var policy = otr.POLICY("DEFAULT");
 
     //available policies
@@ -217,12 +224,19 @@ The policy is used as a parameter in Session().
     'DEFAULT'
     
 ## VFS() - The Virtual File System
+The Virtual File System (vfs) can be easily serialed to JSON for simple import and export to persist key and fingerprint files.
 
-  export:
-  import:
-  load:
-  save:
-  importFile:
-  exportFile:
+     var VFS = otr.VFS();
+
+### VFS.save( vfs_file_location )
+Takes a snapshop of the vfs and stores it on the real filesystem in at location 'filename'.
+ 
+### VFS.load( vfs_file_location )
+Loads a vfs stored in localfile 'filename'
+
+### VFS.exportFile( source, destination )
+Copies a file from the vfs to the real file system.
+
+
   
 
