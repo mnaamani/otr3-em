@@ -3,9 +3,9 @@ if(typeof exports !== 'undefined'){
     var OTR = require("../lib/otr-module");
 }
 
-var libotr = new OTR();
+var otr = OTR;
 
-console.log("== loaded libotr version:",libotr.version());
+console.log("== loaded libotr version:",otr.version());
 
 var debug = function(){};
 
@@ -23,17 +23,17 @@ if(typeof process !== "undefined" ){
 }
 
 if(verbose){
-    libotr.debugOn();
+    otr.debugOn();
     debug = console.error;
 }
 
 if(USE_VFS){
-    var VFS = libotr.VFS(__dirname+"/default.vfs").load();
+    var VFS = otr.VFS(__dirname+"/default.vfs").load();
 }
 
 var keys_dir = "/";
 
-var alice = new libotr.User({name:'alice',keys:keys_dir+'/alice.keys',fingerprints:keys_dir+'/alice.fp'});
+var alice = new otr.User({name:'alice',keys:keys_dir+'/alice.keys',fingerprints:keys_dir+'/alice.fp'});
 //if we dont have a key make one
 if( !alice.state.fingerprint("alice@telechat.org","telechat") ){
 alice.generateKey("alice@telechat.org","telechat",function(err){
@@ -45,9 +45,9 @@ alice.generateKey("alice@telechat.org","telechat",function(err){
 });
 }
 var BOB = alice.ConnContext("alice@telechat.org","telechat","BOB");
-var otrchan_a = new libotr.OTRChannel(alice, BOB,{policy:libotr.POLICY("ALWAYS"),secret:'s3cr37'});
+var otrchan_a = new otr.OTRChannel(alice, BOB,{policy:otr.POLICY("ALWAYS"),secret:'s3cr37'});
 
-var bob = new libotr.User({name:'bob',keys:keys_dir+'/bob.keys',fingerprints:keys_dir+'/bob.fp'});
+var bob = new otr.User({name:'bob',keys:keys_dir+'/bob.keys',fingerprints:keys_dir+'/bob.fp'});
 //if we dont have a key make one
 if( !bob.state.fingerprint("bob@telechat.org","telechat") ){
 bob.generateKey("bob@telechat.org","telechat",function(err){
@@ -59,7 +59,7 @@ bob.generateKey("bob@telechat.org","telechat",function(err){
 });
 }
 var ALICE = bob.ConnContext("bob@telechat.org","telechat","ALICE");
-var otrchan_b = new libotr.OTRChannel(bob, ALICE,{policy:libotr.POLICY("ALWAYS"),secret:'s3cr37'});
+var otrchan_b = new otr.OTRChannel(bob, ALICE,{policy:otr.POLICY("ALWAYS"),secret:'s3cr37'});
 
 var NET_QUEUE_A = async.queue(handle_messages,1);
 var NET_QUEUE_B = async.queue(handle_messages,1);

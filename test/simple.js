@@ -1,8 +1,6 @@
 if(typeof exports !== 'undefined'){
-    var OTR = require("../lib/otr-module");
+    var otr = require("../lib/otr-module");
 }
-
-var otr = new OTR();
 
 console.log("libotr version:",otr.version());
 

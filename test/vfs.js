@@ -1,5 +1,4 @@
-var OTR = require("../lib/otr-module");
-var otr = new OTR();
+var otr = require("../lib/otr-module");
 
 var print = console.error;
 
@@ -22,9 +21,9 @@ VFS.exportFile(settings.key_file,__dirname+"/exported-key-file");
 function test(){
     var us = new otr.UserState();
     
-    var err = us.readKeysSync( settings.key_file);
-
-    if(err){
+    try{
+        us.readKeysSync( settings.key_file);
+    }catch(e){
         us.generateKey(settings.key_file,settings.accountname,settings.protocol,function(err){
           if(err) print("error generating key:",err);
         });

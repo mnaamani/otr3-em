@@ -4,13 +4,9 @@ OTR3-em - Off-the-Record Messaging [emscripten]
 ## Getting started
 
 Require the otr3-em module (underlying gcrypt and otr libraries will be
-initialised. An OTR API constructor is returned.
+initialised. 
 
-    var OTR = require("otr3-em");
-
-create an instance of the OTR API:
-
-    var otr = new OTR();
+    var otr = require("otr3-em");
     
 ## otr.version()
 Returns version information of the underlying libotr:
@@ -20,10 +16,9 @@ Returns version information of the underlying libotr:
 ## otr.User( config )
 The User object is used to manage a user's accounts (public keys) and known fingerprints.
 
-    var OTR = require("otr3-em");
-    var otr = new OTR();
+    var otr = require("otr3-em");
     
-    var user = new OTR.User({ 
+    var user = new otr.User({ 
         keys:'/alice.keys',      //path to OTR keys file (required)
         fingerprints:'alice.fp' //path to fingerprints file (required)
     });
@@ -205,8 +200,7 @@ return true only if the fingerprint of the buddy has been authenticated/verified
 
 The policy is used as a parameter when setting up a Session().
 
-    var OTR = require("otr3-em");
-    var otr = new OTR();
+    var otr = require("otr3-em");
     var policy = otr.POLICY("DEFAULT");
 
     //available policies

@@ -1,5 +1,4 @@
-var OTR = require("../lib/otr-module");
-var otr = new OTR();
+var otr = require("../lib/otr-module");
 
 var print = console.error;
 
