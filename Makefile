@@ -1,7 +1,7 @@
-EMCC = $(HOME)/Dev/emscripten/emcc
-CRYPTO_BUILD = $(HOME)/projects/crypto-emscripten/build-otr3
-
-BUILD_DIR = lib
+EMCC = `./find-emcc.py`/emcc
+CRYPTO_EMSCRIPTEN=$(HOME)/projects/crypto-emscripten
+BUILD= build
+CRYPTO_BUILD = $(CRYPTO_EMSCRIPTEN)/$(BUILD)
 
 EXPORTED_FUNCS= -s EXPORTED_FUNCTIONS="['_gcry_strerror','_malloc','_free','__gcry_mpi_new','__gcry_mpi_set','__gcry_mpi_release', \
             '__gcry_mpi_scan','__gcry_mpi_print','_otrl_version','_otrl_userstate_create','_otrl_userstate_free', \
@@ -19,14 +19,14 @@ EXPORTED_FUNCS= -s EXPORTED_FUNCTIONS="['_gcry_strerror','_malloc','_free','__gc
 OPTIMISATION = -O2 --closure 0 --llvm-opts 1 --minify 0 -s LINKABLE=1 $(EXPORTED_FUNCS)
 
 module-optimised:
-	mkdir -p $(BUILD_DIR)/
-	cp src/header.js $(BUILD_DIR)/_libotr3.js
+	mkdir -p lib/
+	cp src/header.js lib/_libotr3.js
 	$(EMCC) src/jsapi.c -I$(CRYPTO_BUILD)/include -lotr -L$(CRYPTO_BUILD)/lib \
-        -o $(BUILD_DIR)/libotr3_tmp.js \
+        -o lib/libotr3_tmp.js \
 		--pre-js src/otr_pre.js \
 		-s TOTAL_MEMORY=1048576  -s TOTAL_STACK=409600 \
         $(OPTIMISATION)
-	cat $(BUILD_DIR)/libotr3_tmp.js >> $(BUILD_DIR)/_libotr3.js
-	cat src/footer.js >> $(BUILD_DIR)/_libotr3.js
-	mv $(BUILD_DIR)/_libotr3.js $(BUILD_DIR)/libotr3.js
-	rm $(BUILD_DIR)/libotr3_tmp.js
+	cat lib/libotr3_tmp.js >> lib/_libotr3.js
+	cat src/footer.js >> lib/_libotr3.js
+	mv lib/_libotr3.js lib/libotr3.js
+	rm lib/libotr3_tmp.js
