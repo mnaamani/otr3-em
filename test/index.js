@@ -13,6 +13,7 @@ var USE_VFS = false;
 var TEST_PASSED=false;
 var verbose =false;
 var FORCE_SMP = false;
+var SUCCESSFULL_SMP = false;
 
 if(typeof process !== "undefined" ){
  process.argv.forEach(function(arg){
@@ -31,11 +32,11 @@ if(USE_VFS){
     var VFS = otr.VFS(__dirname+"/default.vfs").load();
 }
 
-var keys_dir = "/";
+var keys_dir = ".";
 
 var alice = new otr.User({name:'alice',keys:keys_dir+'/alice.keys',fingerprints:keys_dir+'/alice.fp'});
 //if we dont have a key make one
-if( !alice.state.fingerprint("alice@telechat.org","telechat") ){
+if( !alice.findKey("alice@telechat.org","telechat") ){
 alice.generateKey("alice@telechat.org","telechat",function(err){
     if(err){
         console.error("error generating key:",err.message);
@@ -49,7 +50,7 @@ var otrchan_a = new otr.OTRChannel(alice, BOB,{policy:otr.POLICY("ALWAYS"),secre
 
 var bob = new otr.User({name:'bob',keys:keys_dir+'/bob.keys',fingerprints:keys_dir+'/bob.fp'});
 //if we dont have a key make one
-if( !bob.state.fingerprint("bob@telechat.org","telechat") ){
+if( !bob.findKey("bob@telechat.org","telechat") ){
 bob.generateKey("bob@telechat.org","telechat",function(err){
     if(err){
         console.error("error generating key:",err.message);
@@ -130,12 +131,16 @@ otrchan_b.on("smp_request",function(){
 });
 otrchan_a.on("smp_complete",function(){
     otrchan_a.send("Hello Bob! - 2");
+    SUCCESSFULL_SMP = true;
 });
 
 otrchan_a.send("Hello Bob! - 1");
 
 var loop = setInterval(function(){
     console.log("_");
+    if(FORCE_SMP && !SUCCESSFULL_SMP){
+        return;
+    }
     if(otrchan_a.isEncrypted() && otrchan_a.isAuthenticated() && otrchan_b.isEncrypted() && otrchan_b.isAuthenticated() ){
         console.log("Finger print verification successful");
         dumpConnContext(otrchan_a,"Alice's ConnContext:");
