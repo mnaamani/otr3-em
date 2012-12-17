@@ -20,13 +20,10 @@ OPTIMISATION = -O2 --closure 0 --llvm-opts 1 --minify 0 -s LINKABLE=1 $(EXPORTED
 
 module-optimised:
 	mkdir -p lib/
-	cp src/header.js lib/_libotr3.js
 	$(EMCC) src/jsapi.c -I$(CRYPTO_BUILD)/include -lotr -L$(CRYPTO_BUILD)/lib \
-        -o lib/libotr3_tmp.js \
+        -o lib/_libotr3.js \
 		--pre-js src/otr_pre.js \
 		-s TOTAL_MEMORY=1048576  -s TOTAL_STACK=409600 \
         $(OPTIMISATION)
-	cat lib/libotr3_tmp.js >> lib/_libotr3.js
-	cat src/footer.js >> lib/_libotr3.js
-	mv lib/_libotr3.js lib/libotr3.js
-	rm lib/libotr3_tmp.js
+	cat src/header.js lib/_libotr3.js src/footer.js > lib/libotr3.js
+	rm lib/_libotr3.js
