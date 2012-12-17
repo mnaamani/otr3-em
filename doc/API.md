@@ -41,16 +41,16 @@ We can check what accounts have been load..
 	    fingerprint: '65D366AF CF9B065F 41708CB0 1DC26F61 D3DF5935',
 	    privkey: [Object] } ]
 
-### user.generateKey(accountname,protocol,function callback(err,key) )
+### user.generateKey(accountname,protocol,function (err,privkey) )
 
 To generate an OTR key for a given accountname and protocol:
 (If a key already exists it will be overwritten)
 
-    user.generateKey("alice@jabber.org", "xmpp", function(err, key){
+    user.generateKey("alice@jabber.org", "xmpp", function(err, privkey){
         if(err){
         	console.log("something went wrong!",err.message);
         }else{
-        	console.log("Generated Key Successfully:",key.exportPublic() );
+        	console.log("Generated Key Successfully:",privkey.exportPublic() );
         }
     });
 
@@ -91,12 +91,16 @@ Exports the DSA key for the account/protocol. (Can be imported to another User u
 Will import a DSA key (exported using user.exportKeyHex or user.exportBigInt)
 
 ## OtrlPrivKey
-This is the 'key' object returned in user.accounts(), user.generateKey() and user.findKey().
+This is the 'privkey' object returned in user.accounts(), user.generateKey() and user.findKey().
 
 **privkey.accountname()** - Accountname the key is associated with.
+
 **privkey.protocol()** - Protocol the key is associated with.
+
 **privkey.export(format)** - Exports the private DSA key. format can be "HEX" or "BIGINT"
+
 **privkey.exportPublic(format)** - Exports only the public components of the DSA key. format can be "HEX" or "BINGINT"
+
 
 ## otr.ConnContext()
 A ConnContext with buddy 'BOB' is created from a User() object. The last argument is
@@ -104,7 +108,7 @@ our selected name for buddy Bob.
 
     var context = alice.ConnContext("alice@jabber.org","xmpp","BOB");
 
-The following methods of the ConnContext() expose it's internal state:
+To get the state of a Connection Context:
 
 * protocol(): string: eg. "xmpp"
 * username(): string: name we have given to the buddy, eg. "BOB"
@@ -217,7 +221,7 @@ The policy is used as a parameter when setting up a Session().
     'ALWAYS'
     'DEFAULT'
     
-## VFS() - The Virtual File System
+## otr.VFS() - The Virtual File System
 The Virtual File System (vfs) can be easily serialed to JSON for simple import and export to persist key and fingerprint files.
 
      var VFS = otr.VFS();
