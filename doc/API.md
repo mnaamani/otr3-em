@@ -184,7 +184,7 @@ return true only if the fingerprint of the buddy has been authenticated/verified
 * gone_insecure() - message exchange is now in plain text.
 * still_secure() - encryption re-negotiated. message exchange is encrypted.
 
-* create_privkey() - a private key for account/protocol specified was not found and needs to be created.
+* create_privkey(accountname,protocol) - a private key for account/protocol specified was not found and needs to be created.
 * new_fingerprint(fingerprint) - first time we are seeing buddy's fingerprint. This is a que to begin authentication.
 
 * smp_request(question) - buddy has started SMP authentication. (possibly with a question)
