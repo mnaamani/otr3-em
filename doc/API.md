@@ -176,7 +176,7 @@ return true only if the fingerprint of the buddy has been authenticated/verified
 
 **Handling Session events**
 
-* message(msg) - received decrypted 'msg' message.
+* message(msg,encrypted) - received **msg** message. **encrypted** will be true if message arrived encrypted.
 
 * inject_message(msg_fragment) - encrypted msg_fragment to be sent to buddy.
 
