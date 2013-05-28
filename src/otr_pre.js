@@ -300,51 +300,47 @@ Module['preRun'].push(function(){
         }
     };
 
-
-});//preRun
-
-
-function __msgops_callback_remote_disconnected($opdata,$context){
+ __msgops_callback_remote_disconnected = function($opdata,$context){
     Module["ops_event"]($opdata, (new Module["ConnContext"]($context))["obj"](),"remote_disconnected");
-}
-function __msgops_callback_smp_request($opdata,$context,$question){
+ }
+ __msgops_callback_smp_request = function($opdata,$context,$question){
     var obj = (new Module["ConnContext"]($context))["obj"]();
     if($question!=0) obj["question"] = Module["Pointer_stringify"]($question);
     Module["ops_event"]($opdata, obj, "smp_request");
-}
-function __msgops_callback_smp_failed($opdata,$context){
+ }
+ __msgops_callback_smp_failed = function($opdata,$context){
     Module["ops_event"]($opdata, (new Module["ConnContext"]($context))["obj"](),"smp_failed");
-}
-function __msgops_callback_smp_aborted($opdata,$context){
+ }
+ __msgops_callback_smp_aborted = function($opdata,$context){
     Module["ops_event"]($opdata, (new Module["ConnContext"]($context))["obj"](),"smp_aborted");
-}
-function __msgops_callback_smp_complete($opdata,$context){
+ }
+ __msgops_callback_smp_complete = function($opdata,$context){
     Module["ops_event"]($opdata, (new Module["ConnContext"]($context))["obj"](),"smp_complete");
-}
-function __msgops_callback_policy($opdata, $context) {
-  return Module["ops_event"]($opdata,{},"policy");
-}
+ }
+ __msgops_callback_policy = function($opdata, $context) {
+    return Module["ops_event"]($opdata,{},"policy");
+ }
 
-function __msgops_callback_create_privkey($opdata,$accountname,$protocol){
-  Module["ops_event"]($opdata,{
-    "accountname":Module["Pointer_stringify"]($accountname),
-    "protocol":Module["Pointer_stringify"]($protocol)
-  },"create_privkey");
-}
+ __msgops_callback_create_privkey = function($opdata,$accountname,$protocol){
+   Module["ops_event"]($opdata,{
+     "accountname":Module["Pointer_stringify"]($accountname),
+     "protocol":Module["Pointer_stringify"]($protocol)
+   },"create_privkey");
+ }
 
-function __msgops_callback_is_logged_in($opdata,$accountname,$protocol,$recipient){
-  return Module["ops_event"]($opdata,{},"is_logged_in");
-}
+ __msgops_callback_is_logged_in = function($opdata,$accountname,$protocol,$recipient){
+   return Module["ops_event"]($opdata,{},"is_logged_in");
+ }
 
-function __msgops_callback_inject_message($opdata,$accountname,$protocol,
+ __msgops_callback_inject_message = function($opdata,$accountname,$protocol,
             $recipient,$message){
 
     Module["ops_event"]($opdata,{
         "message":Module["Pointer_stringify"]($message)
     },"inject_message");
-}
+ }
 
-function __msgops_callback_notify($opdata,$level,$accountname,$protocol,
+ __msgops_callback_notify = function($opdata,$level,$accountname,$protocol,
         $username,$title,$primary,$secondary){
     Module["ops_event"]($opdata,{
         "title":Module["Pointer_stringify"]($title),
@@ -352,41 +348,45 @@ function __msgops_callback_notify($opdata,$level,$accountname,$protocol,
         "secondary":Module["Pointer_stringify"]($secondary),
         "level":$level
     },"notify");
-}
+ }
 
-function __msgops_callback_display_otr_message($opdata,$accountname,$protocol,$username,$msg){
+ __msgops_callback_display_otr_message = function($opdata,$accountname,$protocol,$username,$msg){
     Module["ops_event"]($opdata,{
         "message":Module["Pointer_stringify"]($msg)
     },"display_otr_message");
     return 1;//fire notify as well
 }
 
-function __msgops_callback_update_context_list($opdata){
+__msgops_callback_update_context_list = function($opdata){
     Module["ops_event"]($opdata,{},"update_context_list");
-}
+ }
 
-function __msgops_callback_new_fingerprint($opdata,$userstate,$accountname,$protocol,$username,$fingerprint_human){
+ __msgops_callback_new_fingerprint = function($opdata,$userstate,$accountname,$protocol,$username,$fingerprint_human){
     Module["ops_event"]($opdata,{
         "fingerprint":Module["Pointer_stringify"]($fingerprint_human)
     },"new_fingerprint")    
-}
-function __msgops_callback_write_fingerprints($opdata){
+ }
+ __msgops_callback_write_fingerprints = function($opdata){
     Module["ops_event"]($opdata,{},"write_fingerprints");
-}
-function __msgops_callback_gone_secure($opdata,$context){
+ }
+ __msgops_callback_gone_secure = function($opdata,$context){
     Module["ops_event"]($opdata,{},"gone_secure");
-}
-function __msgops_callback_gone_insecure($opdata,$context){
+ }
+ __msgops_callback_gone_insecure = function($opdata,$context){
     Module["ops_event"]($opdata,{},"gone_insecure");
-}
-function __msgops_callback_still_secure($opdata,$context,$is_reply){
+ }
+ __msgops_callback_still_secure = function($opdata,$context,$is_reply){
     Module["ops_event"]($opdata,{},"still_secure");
-}
-function __msgops_callback_log_message($opdata,$message){
+ }
+ __msgops_callback_log_message = function($opdata,$message){
     Module["ops_event"]($opdata,{
         "message":Module["Pointer_stringify"]($message)
     },"log_message");
-}
-function __msgops_callback_max_message_size($opdata,$context){
+ }
+ __msgops_callback_max_message_size = function($opdata,$context){
     return Module["ops_event"]($opdata,{},"max_message_size");
-}
+ }
+
+});//preRun
+
+
