@@ -9,7 +9,6 @@ __ATINIT__ = __ATINIT__.concat([
 */
 function _i32______gpg_err_init_to_void_____(){};//workaround.. TODO:investigate
 
-//wrap these in Module also?
 var _static_buffer_ptr;
 var _static_new_mpi_ptr_ptr;
 var gcry_ = {};
@@ -135,51 +134,19 @@ Module['preRun'].push(function(){
     Module["helper"]["mpi2bigint"] = helper_.mpi2bigint = __mpi2bigint;
     Module["helper"]["bigint2mpi"] = helper_.bigint2mpi = __bigint2mpi;
 
-// some of the MPI calculations are slow
-// can we use pure javascript crypto and still preserve the libgcrypt API?
-
-/* native alot faster don't override
-        __gcry_mpi_add = function BigInt_MPI_ADD(w,u,v){
-            var ww = BI.add( __mpi2bigint(u), __mpi2bigint(v) );
-            __bigint2mpi(w,ww);
+        /* _gcry_mpi_tdiv_qr( gcry_mpi_t quot, gcry_mpi_t rem, gcry_mpi_t num, gcry_mpi_t den)
+         * !!!!!!! EL GAMAL FAILS in pubkey.js test!!!! so does ECC DSA!!
+        __gcry_mpi_tdiv_qr = function BigInt_MPI_DIVIDE_(mpi_quot,mpi_rem,mpi_num,mpi_den){
+            var q = BI.str2bigInt("0",16,512);//should have enough elements to store Q
+            var r = BI.str2bigInt("0",16,512);//what is the best size determined from sizes of num and den?
+            var num = __mpi2bigint(mpi_num);
+            var den = __mpi2bigint(mpi_den);
+            BI.divide_(num,den,q,r);
+            if(mpi_quot) __bigint2mpi(mpi_quot,q);
+            if(mpi_rem) __bigint2mpi(mpi_rem, r);
         };
-*/
-/* not tested but my guess is it wont significantly increase performance
-        __gcry_mpi_sub = function BigInt_MPI_SUB(w,u,v){
-            var ww = BI.sub( __mpi2bigint(u), __mpi2bigint(v) );
-            __bigint2mpi(w,ww);
-        };
-*/
-/*native is faster, but its still quite fast!
-        __gcry_mpi_mul = function BigInt_MPI_MULT(w,u,v){
-            var ww = BI.mult( __mpi2bigint(u), __mpi2bigint(v) );
-            __bigint2mpi(w,ww);
-        };
-*/
-
-/*
-//void gcry_mpi_mul_2exp (gcry_mpi_t w, gcry_mpi_t u, unsigned long e)
-//w = u * 2^e.
-
-    __gcry_mpi_mul2exp = function BigInt_MPI_MUL2EXP(mpi_w, mpi_u, e){
-       
-    };
-*/
-
-
-//_gcry_mpi_tdiv_qr( gcry_mpi_t quot, gcry_mpi_t rem, gcry_mpi_t num, gcry_mpi_t den)
-/** !!!!!!! EL GAMAL FAILS in pubkey.js test!!!! so does ECC DSA!!
-    __gcry_mpi_tdiv_qr = function BigInt_MPI_DIVIDE_(mpi_quot,mpi_rem,mpi_num,mpi_den){
-        var q = BI.str2bigInt("0",16,512);//should have enough elements to store Q
-        var r = BI.str2bigInt("0",16,512);//what is the best size determined from sizes of num and den?
-        var num = __mpi2bigint(mpi_num);
-        var den = __mpi2bigint(mpi_den);
-        BI.divide_(num,den,q,r);
-        if(mpi_quot) __bigint2mpi(mpi_quot,q);
-        if(mpi_rem) __bigint2mpi(mpi_rem, r);
-    };
-*/      
-/* disabled mpi_gcd causes some tests to fail
+       */      
+       /* disabled mpi_gcd causes some tests to fail
         console.log("overriding __gcry_mpi_gcd");
         __gcry_mpi_gcd = function BigInt_MPI_GCD(mpi_g, mpi_a, mpi_b){
             //console.log(">__gcry_mpi_gcd()");
@@ -191,8 +158,20 @@ Module['preRun'].push(function(){
             if( BigInt["equalsInt"](g,1) ) return 1;
             return 0;
         };
-*/
-/*perf boost not tested but it should be enhancing..*/
+       */
+        /*
+        //no significant improvement, but if enabled without mulpowm -- degrades performance!
+        // w = u * v mod m --> (u*v) mod m  ===  u * (v mod m) ? 
+        __gcry_mpi_mulm = function BigInt_MPI_MULTMOD(w, u, v, m){
+          var bi_u = __mpi2bigint(u);
+          var bi_v = __mpi2bigint(v);
+          var bi_m = __mpi2bigint(m);
+          //faster when v < u (and gives correct value!)
+          var result = BI.greater(bi_u,bi_v) ? BI.multMod(bi_u,bi_v,bi_m) :BI.multMod(bi_v,bi_u,bi_m);
+          __bigint2mpi(w,result);
+        };
+        */
+
         __gcry_mpi_mod = function BigInt_MPI_MOD(mpi_r,mpi_x,mpi_n){
             //console.log(">__gcry_mpi_mod()");
             //r = x mod n
@@ -201,8 +180,6 @@ Module['preRun'].push(function(){
             __bigint2mpi(mpi_r, BigInt["mod"](x,n));
         };
         
-
-//confirmed bigint mulpowm, powm and invm, gcd  enhance performance..
         __gcry_mpi_powm = function BigInt_MPI_POWMOD(w, b, e, m){
             //console.log(">__gcry_mpi_powm()");
           var bi_base = __mpi2bigint(b);
@@ -226,18 +203,6 @@ Module['preRun'].push(function(){
                 return 0;//no inverse mod exists
             }
         };
-/*
-//no significant improvement, but if enabled without mulpowm -- degrades performance!
-        // w = u * v mod m --> (u*v) mod m  ===  u * (v mod m) ? 
-        __gcry_mpi_mulm = function BigInt_MPI_MULTMOD(w, u, v, m){
-          var bi_u = __mpi2bigint(u);
-          var bi_v = __mpi2bigint(v);
-          var bi_m = __mpi2bigint(m);
-          //faster when v < u (and gives correct value!)
-          var result = BI.greater(bi_u,bi_v) ? BI.multMod(bi_u,bi_v,bi_m) :BI.multMod(bi_v,bi_u,bi_m);
-          __bigint2mpi(w,result);
-        };
-*/
 
         __gcry_mpi_mulpowm = function BigInt_MPI_MULPOWM(mpi_r,mpi_array_base,mpi_array_exp,mpi_m){
             //console.log(">__gcry_mpi_mulpowm()");
@@ -267,11 +232,7 @@ Module['preRun'].push(function(){
             __bigint2mpi(mpi_r,bi_result);
         };
 
-//TODO: _gcry_generate_fips186_2_prime
-//      _gcry_generate_elg_prime
-
-
-/*static gcry_mpi_t gen_prime (unsigned int nbits, int secret, int randomlevel,
+    /*static gcry_mpi_t gen_prime (unsigned int nbits, int secret, int randomlevel,
                              int (*extra_check)(void *, gcry_mpi_t),
                              void *extra_check_arg);*/
     _gen_prime = function BigInt_Prime(nbits,secretlevel,randomlevel,xtracheck,xtracheck_args){
