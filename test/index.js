@@ -46,7 +46,7 @@ alice.generateKey("alice@telechat.org","telechat",function(err){
 });
 }
 var BOB = alice.ConnContext("alice@telechat.org","telechat","BOB");
-var otrchan_a = new otr.OTRChannel(alice, BOB,{policy:otr.POLICY("ALWAYS"),secret:'s3cr37'});
+var otrchan_a = new otr.Session(alice, BOB,{policy:otr.POLICY("ALWAYS"),secret:'s3cr37'});
 
 var bob = new otr.User({name:'bob',keys:keys_dir+'/bob.keys',fingerprints:keys_dir+'/bob.fp'});
 //if we dont have a key make one
@@ -60,7 +60,7 @@ bob.generateKey("bob@telechat.org","telechat",function(err){
 });
 }
 var ALICE = bob.ConnContext("bob@telechat.org","telechat","ALICE");
-var otrchan_b = new otr.OTRChannel(bob, ALICE,{policy:otr.POLICY("ALWAYS"),secret:'s3cr37'});
+var otrchan_b = new otr.Session(bob, ALICE,{policy:otr.POLICY("ALWAYS"),secret:'s3cr37'});
 
 var NET_QUEUE_A = async.queue(handle_messages,1);
 var NET_QUEUE_B = async.queue(handle_messages,1);
