@@ -16,7 +16,7 @@ EXPORTED_FUNCS= -s EXPORTED_FUNCTIONS="['_gcry_strerror','_malloc','_free','__gc
             '_otrl_privkey_find', '_jsapi_privkey_delete', '_jsapi_privkey_get_dsa_token', '_jsapi_userstate_import_privkey','_jsapi_userstate_write_to_file']"
 
 #O2 optimisation requires --llvm-opts 1, closure will break virtual file system import/export functionality
-OPTIMISATION = -O2 --closure 0 --llvm-opts 1 --minify 0 -s LINKABLE=1 $(EXPORTED_FUNCS)
+OPTIMISATION = -O2 --closure 0 --llvm-opts 1 --minify 0 -s LINKABLE=1 $(EXPORTED_FUNCS) -s ASM_JS=0
 
 module-optimised:
 	mkdir -p lib/
