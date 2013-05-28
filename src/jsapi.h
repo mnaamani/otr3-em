@@ -66,6 +66,6 @@ void msgops_callback_account_name_free(void *opdata, const char *account_name);
 OtrlMessageAppOps* jsapi_messageappops_new();
 
 int jsapi_message_receiving (OtrlUserState userstate,OtrlMessageAppOps *messageops, void *opsdata, 
-        char *accountname, char *protocol, char *sender, char *message, char** newmessage) EMSCRIPTEN_KEEPALIVE;
+        char *accountname, char *protocol, char *sender, char *message, char** newmessage);
 
 int jsapi_can_start_smp(ConnContext* ctx);
