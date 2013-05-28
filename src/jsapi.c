@@ -1,7 +1,6 @@
 #include "jsapi.h"
 
 void jsapi_initialise(){
-    printf("Initialising libgcrypt...\n");
     /* Version check should be the very first call because it
           makes sure that important subsystems are intialized. */
 	if (!gcry_check_version (GCRYPT_VERSION))
@@ -11,7 +10,6 @@ void jsapi_initialise(){
     }
 
     gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0);
-    printf("Initialising libotr...\n");
     OTRL_INIT;
 }
 
