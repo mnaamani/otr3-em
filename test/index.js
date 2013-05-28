@@ -11,7 +11,7 @@ var debug = function(){};
 
 var USE_VFS = false;
 var TEST_PASSED=false;
-var verbose =false;
+var verbose =true;
 var FORCE_SMP = false;
 var SUCCESSFULL_SMP = false;
 
@@ -25,7 +25,7 @@ if(typeof process !== "undefined" ){
 
 if(verbose){
     otr.debugOn();
-    debug = console.error;
+    debug = function(){console.log([].join.call(arguments," "));};
 }
 
 if(USE_VFS){
