@@ -14,9 +14,5 @@
         "type":"git",
         "url":"git@github.com:mnaamani/otr3-em.git"
     },
-    "dependencies":
-    {
-        "async":"*"
-    },
     "license": "GPLv2"
 }
