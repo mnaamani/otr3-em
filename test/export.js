@@ -15,7 +15,7 @@ var settings_b = {
     'fp_file': 'bob.fp',
 }
 
-var VFS = otr.VFS().load( VFS_PATH );
+var VFS = otr.VFS();
 
 test();
 
@@ -36,18 +36,14 @@ function test(){
         fingerprints: settings_b.fp_file
     });
 
-    var testkey;
-
     ALICE.generateKey("alice@export.test","test",function(err,key){
         if(err) exit("key generation failed");
-        testkey = key;
-    });     
+    });
     print(ALICE.accounts());
 
-    print( testkey.export() );
-
-    BOB.importKey("bob@import.test","test",testkey.export("BIGINT"));
-
+    BOB.generateKey("bob@export.test","test",function(err,key){
+        if(err) exit("key generation failed");
+    });
     print(BOB.accounts());
 }
 

@@ -26,9 +26,9 @@ function test(){
     });
 
     var key = user.findKey(settings.accountname,settings.protocol); 
-    if(key) print( key.export() );
-    
-    if(!key){
+    if(key){
+       print( key.export() );
+    } else {
         user.generateKey(settings.accountname,settings.protocol,function(err,key){
           if(err) {
             print("error generating key:",err);
@@ -39,5 +39,5 @@ function test(){
     }
     
     print(user.state.accounts());
-    user.deleteKey(settings.accountname,settings.protocol);
+    //user.deleteKey(settings.accountname,settings.protocol);
 }

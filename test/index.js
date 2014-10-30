@@ -130,8 +130,10 @@ otrchan_b.on("smp_request",function(){
         otrchan_b.respond_smp('s3cr37');
 });
 otrchan_a.on("smp_complete",function(){
-    otrchan_a.send("Hello Bob! - 2");
     SUCCESSFULL_SMP = true;
+});
+otrchan_b.on("smp_complete",function(){
+    otrchan_a.send("Hello Bob! - 2");
 });
 
 otrchan_a.send("Hello Bob! - 1");
